@@ -20,7 +20,7 @@ interface CodeViewerProps {
 
 export const CodeViewer: React.FC<CodeViewerProps> = ({ value }) => {
   return (
-    <div className="h-full relative rounded-lg overflow-hidden">
+    <div className="relative rounded-lg overflow-hidden" style={{ minHeight: '200px' }}>
       <div className="absolute inset-0">
         <AceEditor
           mode="javascript"
@@ -84,7 +84,7 @@ const CodeEditor: React.FC<CodeEditorProps> = ({
 }) => {
   return (
     <div className="h-full relative rounded-lg overflow-hidden">
-      <div className="absolute inset-0">
+      <div className="absolute inset-0 bg-[#2d2d2d]">
         <AceEditor
           mode="javascript"
           theme="tomorrow_night"
@@ -103,9 +103,7 @@ const CodeEditor: React.FC<CodeEditorProps> = ({
           readOnly={readOnly}
           width="100%"
           height="100%"
-          style={{
-            backgroundColor: '#2d2d2d',
-          }}
+          style={{ backgroundColor: '#2d2d2d' }}
         />
       </div>
     </div>
