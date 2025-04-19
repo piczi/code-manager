@@ -6,8 +6,9 @@ import { Label } from "@/components/ui/label"
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card"
 import { useToast } from "@/components/ui/use-toast"
 import { Toaster } from "@/components/ui/toaster"
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from './components/ui/select'
-import CodeEditor from './components/CodeEditor'
+import CodeEditor from "@/components/CodeEditor"
+import { Copy, Trash2 } from 'lucide-react'
+import * as beautify from 'js-beautify'
 
 interface CodeSnippet {
   id: string
@@ -28,8 +29,6 @@ export default function App() {
     category: 'general'
   })
   const { toast } = useToast()
-  const [code, setCode] = useState('')
-  const [language, setLanguage] = useState('javascript')
 
   useEffect(() => {
     // Load snippets from chrome.storage
@@ -39,6 +38,35 @@ export default function App() {
       }
     })
   }, [])
+
+  const formatCode = (code: string) => {
+    try {
+      // 确保代码以分号结尾
+      const codeWithSemicolon = code.trim().endsWith(';') ? code : code + ';';
+      return beautify.js(codeWithSemicolon, {
+        indent_size: 2,
+        indent_char: ' ',
+        max_preserve_newlines: 1,
+        preserve_newlines: true,
+        keep_array_indentation: false,
+        break_chained_methods: false,
+        indent_scripts: 'normal',
+        brace_style: 'collapse',
+        space_before_conditional: true,
+        unescape_strings: false,
+        jslint_happy: false,
+        end_with_newline: true,
+        wrap_line_length: 80,
+        indent_inner_html: false,
+        comma_first: false,
+        e4x: false,
+        indent_empty_lines: false
+      })
+    } catch (e) {
+      console.error('Formatting error:', e);
+      return code;
+    }
+  }
 
   const saveSnippet = () => {
     if (!newSnippet.title || !newSnippet.code) {
@@ -50,10 +78,14 @@ export default function App() {
       return
     }
 
+    // 格式化代码
+    const formattedCode = formatCode(newSnippet.code)
+    console.log('Formatted code:', formattedCode); // 调试用
+
     const snippet: CodeSnippet = {
       id: Date.now().toString(),
       title: newSnippet.title!,
-      code: newSnippet.code!,
+      code: formattedCode,
       language: newSnippet.language!,
       tags: newSnippet.tags!,
       category: newSnippet.category!
@@ -96,104 +128,57 @@ export default function App() {
     })
   }
 
-  const handleFormat = () => {
-    try {
-      const formatted = JSON.stringify(JSON.parse(code), null, 2)
-      setCode(formatted)
-    } catch (error) {
-      console.error('Invalid JSON')
-    }
-  }
-
   return (
-    <div className="min-h-screen bg-gray-100 p-4">
-      <div className="max-w-4xl mx-auto">
-        <div className="bg-white rounded-lg shadow-sm p-4">
-          <div className="flex items-center justify-between mb-4">
-            <div className="flex items-center gap-2">
-              <Select value={language} onValueChange={setLanguage}>
-                <SelectTrigger className="w-[180px]">
-                  <SelectValue placeholder="Select language" />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="javascript">JavaScript</SelectItem>
-                  <SelectItem value="typescript">TypeScript</SelectItem>
-                  <SelectItem value="json">JSON</SelectItem>
-                  <SelectItem value="html">HTML</SelectItem>
-                  <SelectItem value="css">CSS</SelectItem>
-                </SelectContent>
-              </Select>
-            </div>
-            <div className="flex items-center gap-2">
-              <Button
-                variant="outline"
-                size="sm"
-                onClick={handleFormat}
-                className="text-gray-600 hover:text-gray-900"
-              >
-                Format
-              </Button>
-              <Button
-                variant="outline"
-                size="sm"
-                onClick={() => setCode('')}
-                className="text-gray-600 hover:text-gray-900"
-              >
-                Clear
-              </Button>
-            </div>
-          </div>
-          <div className="h-[600px] border rounded-md overflow-hidden">
-            <CodeEditor
-              value={code}
-              onChange={setCode}
-              language={language}
-            />
-          </div>
-        </div>
-      </div>
-      <div className="w-[800px] h-[600px] p-4">
-        <Tabs defaultValue="snippets">
+    <div className="min-h-screen bg-background p-4">
+      <Toaster />
+      <div className="max-w-7xl mx-auto">
+        <Tabs defaultValue="snippets" className="w-full">
           <TabsList className="grid w-full grid-cols-2">
             <TabsTrigger value="snippets">My Snippets</TabsTrigger>
             <TabsTrigger value="new">New Snippet</TabsTrigger>
           </TabsList>
-          
           <TabsContent value="snippets">
-            <div className="grid gap-4">
+            <div className="grid gap-6">
               {snippets.map((snippet) => (
-                <Card key={snippet.id}>
-                  <CardHeader>
-                    <CardTitle>{snippet.title}</CardTitle>
-                    <CardDescription>
+                <Card key={snippet.id} className="overflow-hidden">
+                  <CardHeader className="relative pb-2">
+                    <CardTitle className="text-lg">{snippet.title}</CardTitle>
+                    <CardDescription className="text-sm">
                       Language: {snippet.language} | Category: {snippet.category}
                       {snippet.tags.length > 0 && ` | Tags: ${snippet.tags.join(', ')}`}
                     </CardDescription>
+                    <div className="absolute top-2 right-4 flex gap-2">
+                      <Button
+                        variant="ghost"
+                        size="icon"
+                        onClick={() => copySnippet(snippet.code)}
+                        className="h-8 w-8"
+                      >
+                        <Copy className="h-4 w-4" />
+                      </Button>
+                      <Button
+                        variant="ghost"
+                        size="icon"
+                        onClick={() => deleteSnippet(snippet.id)}
+                        className="h-8 w-8 text-destructive hover:text-destructive"
+                      >
+                        <Trash2 className="h-4 w-4" />
+                      </Button>
+                    </div>
                   </CardHeader>
-                  <CardContent>
-                    <pre className="bg-muted p-2 rounded-md">
-                      <code>{snippet.code}</code>
-                    </pre>
+                  <CardContent className="pt-4 pb-6">
+                    <div className="relative">
+                      <CodeEditor
+                        value={formatCode(snippet.code)}
+                        onChange={() => {}}
+                        readOnly={true}
+                      />
+                    </div>
                   </CardContent>
-                  <CardFooter className="flex justify-end gap-2">
-                    <Button
-                      variant="outline"
-                      onClick={() => copySnippet(snippet.code)}
-                    >
-                      Copy
-                    </Button>
-                    <Button
-                      variant="destructive"
-                      onClick={() => deleteSnippet(snippet.id)}
-                    >
-                      Delete
-                    </Button>
-                  </CardFooter>
                 </Card>
               ))}
             </div>
           </TabsContent>
-          
           <TabsContent value="new">
             <Card>
               <CardHeader>
@@ -214,14 +199,12 @@ export default function App() {
                 
                 <div className="space-y-2">
                   <Label htmlFor="code">Code</Label>
-                  <textarea
-                    id="code"
-                    className="w-full h-32 p-2 border rounded-md"
-                    value={newSnippet.code}
-                    onChange={(e) => setNewSnippet({...newSnippet, code: e.target.value})}
-                    placeholder="Enter your code here"
-                    aria-label="Code snippet"
-                  />
+                  <div className="h-64 border rounded-md overflow-hidden">
+                    <CodeEditor
+                      value={newSnippet.code || ''}
+                      onChange={(value) => setNewSnippet({...newSnippet, code: value})}
+                    />
+                  </div>
                 </div>
                 
                 <div className="space-y-2">
@@ -261,7 +244,6 @@ export default function App() {
           </TabsContent>
         </Tabs>
       </div>
-      <Toaster />
     </div>
   )
-} 
+}
