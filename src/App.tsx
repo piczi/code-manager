@@ -11,8 +11,9 @@ import {
   AlertDialogTitle,
 } from "@/components/ui/alert-dialog"
 import { useSnippets } from "@/hooks/useSnippets"
-import SnippetList from "@/components/SnippetList"
-import NewSnippetForm from "@/components/NewSnippetForm"
+import React, { Suspense } from "react"
+const SnippetList = React.lazy(() => import("@/components/SnippetList"));
+const NewSnippetForm = React.lazy(() => import("@/components/NewSnippetForm"));
 
 export default function App() {
   const {
@@ -63,32 +64,36 @@ export default function App() {
             <TabsTrigger value="new">新建片段</TabsTrigger>
           </TabsList>
           <TabsContent value="snippets">
-            <SnippetList
-              currentPageSnippets={currentPageSnippets}
-              searchTerm={searchTerm}
-              setSearchTerm={setSearchTerm}
-              activeCategory={activeCategory}
-              setActiveCategory={setActiveCategory}
-              activeTag={activeTag}
-              setActiveTag={setActiveTag}
-              currentPage={currentPage}
-              setCurrentPage={setCurrentPage}
-              totalPages={totalPages}
-              allCategories={allCategories}
-              allTags={allTags}
-              copySnippet={copySnippet}
-              setSnippetToDelete={setSnippetToDelete}
-              formatCode={formatCode}
-            />
-          </TabsContent>
-          <TabsContent value="new">
-            <NewSnippetForm
-              newSnippet={newSnippet}
-              setNewSnippet={setNewSnippet}
-              saveSnippet={saveSnippet}
-              allTags={allTags}
-            />
-          </TabsContent>
+  <Suspense fallback={<div>加载中...</div>}>
+    <SnippetList
+      currentPageSnippets={currentPageSnippets}
+      searchTerm={searchTerm}
+      setSearchTerm={setSearchTerm}
+      activeCategory={activeCategory}
+      setActiveCategory={setActiveCategory}
+      activeTag={activeTag}
+      setActiveTag={setActiveTag}
+      currentPage={currentPage}
+      setCurrentPage={setCurrentPage}
+      totalPages={totalPages}
+      allCategories={allCategories}
+      allTags={allTags}
+      copySnippet={copySnippet}
+      setSnippetToDelete={setSnippetToDelete}
+      formatCode={formatCode}
+    />
+  </Suspense>
+</TabsContent>
+<TabsContent value="new">
+  <Suspense fallback={<div>加载中...</div>}>
+    <NewSnippetForm
+      newSnippet={newSnippet}
+      setNewSnippet={setNewSnippet}
+      saveSnippet={saveSnippet}
+      allTags={allTags}
+    />
+  </Suspense>
+</TabsContent>
         </Tabs>
       </div>
     </div>
