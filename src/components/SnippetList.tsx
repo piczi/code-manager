@@ -26,7 +26,6 @@ interface SnippetListProps {
   copySnippet: (snippet: CodeSnippet) => void;
   setSnippetToDelete: React.Dispatch<React.SetStateAction<CodeSnippet | null>>;
   formatCode: (code: string, language: string) => string;
-  importSnippets: (snippets: CodeSnippet[]) => void;
   currentPage: number;
   setCurrentPage: (page: number) => void;
   totalPages: number;
@@ -45,7 +44,6 @@ export default function SnippetList({
   copySnippet,
   setSnippetToDelete,
   formatCode,
-  importSnippets,
   currentPage,
   setCurrentPage,
   totalPages
@@ -67,8 +65,6 @@ export default function SnippetList({
         setActiveTag={setActiveTag}
         allCategories={allCategories}
         allTags={allTags}
-        snippets={snippets}
-        importSnippets={importSnippets}
       />
 
       {/* 统计信息 */}

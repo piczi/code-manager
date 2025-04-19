@@ -1,12 +1,14 @@
 import React, { Suspense } from "react"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
-import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle } from "@/components/ui/alert-dialog"
+import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogHeader, AlertDialogTitle } from "@/components/ui/alert-dialog"
 import { useSnippets } from "@/hooks/useSnippets"
 
 const SnippetList = React.lazy(() => import("@/components/SnippetList"));
 const NewSnippetForm = React.lazy(() => import("@/components/NewSnippetForm"));
 
 export default function App() {
+  const [activeTab, setActiveTab] = React.useState("list");
+  
   const {
     snippets,
     searchTerm,
@@ -27,13 +29,17 @@ export default function App() {
     setNewSnippet,
     handleAddSnippet,
     handleDeleteSnippet,
-    handleImportSnippets,
     snippetToDelete
   } = useSnippets()
 
+  // 自定义保存函数
+  const handleSaveSnippet = async () => {
+    await handleAddSnippet();
+  };
+
   return (
     <div className="container mx-auto p-4">
-      <Tabs defaultValue="list" className="w-full">
+      <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
         <TabsList className="grid w-full grid-cols-2">
           <TabsTrigger value="list">代码片段列表</TabsTrigger>
           <TabsTrigger value="new">新建代码片段</TabsTrigger>
@@ -56,7 +62,6 @@ export default function App() {
               copySnippet={copySnippet}
               setSnippetToDelete={setSnippetToDelete}
               formatCode={formatCode}
-              importSnippets={handleImportSnippets}
             />
           </Suspense>
         </TabsContent>
@@ -65,29 +70,29 @@ export default function App() {
             <NewSnippetForm
               newSnippet={newSnippet}
               setNewSnippet={setNewSnippet}
-              saveSnippet={handleAddSnippet}
+              saveSnippet={handleSaveSnippet}
               allTags={allTags}
             />
           </Suspense>
         </TabsContent>
       </Tabs>
       <AlertDialog open={snippetToDelete !== null} onOpenChange={(open) => !open && setSnippetToDelete(null)}>
-        <AlertDialogContent>
+        <AlertDialogContent className="rounded-xl shadow-lg border-0 p-6">
           <AlertDialogHeader>
             <AlertDialogTitle>确认删除</AlertDialogTitle>
             <AlertDialogDescription>
               您确定要删除这个代码片段吗？此操作无法撤销。
             </AlertDialogDescription>
           </AlertDialogHeader>
-          <AlertDialogFooter>
-            <AlertDialogCancel className="mt-0 w-20">取消</AlertDialogCancel>
+          <div className="flex flex-row justify-end items-center gap-2">
+            <AlertDialogCancel className="w-20 h-10 px-0 rounded-md mt-0">取消</AlertDialogCancel>
             <AlertDialogAction 
               onClick={() => snippetToDelete && handleDeleteSnippet(snippetToDelete.id)}
-              className="mt-0 w-20"
+              className="w-20 h-10 px-0 rounded-md"
             >
               删除
             </AlertDialogAction>
-          </AlertDialogFooter>
+          </div>
         </AlertDialogContent>
       </AlertDialog>
     </div>

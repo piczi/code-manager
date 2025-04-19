@@ -171,17 +171,7 @@ export function useSnippets() {
     allTags,
     handleAddSnippet: saveSnippet,
     handleDeleteSnippet: deleteSnippet,
-    handleImportSnippets: async (newSnippets: CodeSnippet[]) => {
-      try {
-        for (const snippet of newSnippets) {
-          await db.saveSnippet(snippet);
-        }
-        await loadSnippets();
-        toast({ title: '成功', description: '代码片段已成功导入' });
-      } catch (error) {
-        toast({ title: '错误', description: '导入代码片段失败', variant: 'destructive' });
-      }
-    },
+
     copySnippet,
     formatCode
   };
