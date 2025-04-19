@@ -37,6 +37,12 @@ export default defineConfig({
 </html>`
         
         fs.writeFileSync('dist/popup.html', html)
+
+        // 复制 Ace Editor 资源文件
+        const acePath = path.resolve(__dirname, 'node_modules/ace-builds/src-noconflict');
+        const distAcePath = path.resolve(__dirname, 'dist/ace');
+        fs.ensureDirSync(distAcePath);
+        fs.copySync(acePath, distAcePath);
       }
     }
   ],
@@ -47,7 +53,7 @@ export default defineConfig({
   },
   server: {
     port: 5173,
-    open: true,
+    open: '/index.html'
   },
   build: {
     rollupOptions: {
