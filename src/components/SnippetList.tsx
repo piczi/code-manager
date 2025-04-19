@@ -1,48 +1,60 @@
-import { Card, CardHeader, CardTitle, CardDescription, CardContent } from "@/components/ui/card"
+import { useState } from 'react'
 import { Button } from "@/components/ui/button"
 import { Copy, Trash2, Check } from 'lucide-react'
 import { CodeViewer } from "@/components/CodeEditor"
-import { CodeSnippet } from '@/hooks/useSnippets'
+import type { CodeSnippet } from '@/types'
 import FilterControls from './FilterControls'
 import PaginationControls from './PaginationControls'
-import { useState } from 'react'
+import {
+  Card,
+  CardHeader,
+  CardTitle,
+  CardDescription,
+  CardContent,
+} from "@/components/ui/card"
 
 interface SnippetListProps {
-  currentPageSnippets: CodeSnippet[]
-  searchTerm: string
-  setSearchTerm: (term: string) => void
-  activeCategory: string
-  setActiveCategory: (category: string) => void
-  activeTag: string
-  setActiveTag: (tag: string) => void
-  currentPage: number
-  setCurrentPage: (page: number) => void
-  totalPages: number
-  allCategories: string[]
-  allTags: string[]
-  copySnippet: (code: string) => void
-  setSnippetToDelete: (id: string | null) => void
-  formatCode: (code: string) => string
+  snippets: CodeSnippet[];
+  searchTerm: string;
+  setSearchTerm: (term: string) => void;
+  activeCategory: string;
+  setActiveCategory: (category: string) => void;
+  activeTag: string;
+  setActiveTag: (tag: string) => void;
+  allCategories: string[];
+  allTags: string[];
+  copySnippet: (snippet: CodeSnippet) => void;
+  setSnippetToDelete: React.Dispatch<React.SetStateAction<CodeSnippet | null>>;
+  formatCode: (code: string, language: string) => string;
+  importSnippets: (snippets: CodeSnippet[]) => void;
+  currentPage: number;
+  setCurrentPage: (page: number) => void;
+  totalPages: number;
 }
 
 export default function SnippetList({
-  currentPageSnippets,
+  snippets,
   searchTerm,
   setSearchTerm,
   activeCategory,
   setActiveCategory,
   activeTag,
   setActiveTag,
-  currentPage,
-  setCurrentPage,
-  totalPages,
   allCategories,
   allTags,
   copySnippet,
   setSnippetToDelete,
-  formatCode
+  formatCode,
+  importSnippets,
+  currentPage,
+  setCurrentPage,
+  totalPages
 }: SnippetListProps) {
-  const [copiedSnippetId, setCopiedSnippetId] = useState<string | null>(null)
+  const [copiedSnippetId, setCopiedSnippetId] = useState<string | null>(null);
+  const currentPageSnippets = snippets.slice(
+    (currentPage - 1) * 10,
+    currentPage * 10
+  );
 
   return (
     <>
@@ -55,6 +67,8 @@ export default function SnippetList({
         setActiveTag={setActiveTag}
         allCategories={allCategories}
         allTags={allTags}
+        snippets={snippets}
+        importSnippets={importSnippets}
       />
 
       {/* 统计信息 */}
@@ -73,7 +87,7 @@ export default function SnippetList({
                     variant="ghost"
                     size="icon"
                     onClick={() => {
-                      copySnippet(snippet.code)
+                      copySnippet(snippet)
                       setCopiedSnippetId(snippet.id)
                       setTimeout(() => setCopiedSnippetId(null), 1000)
                     }}
@@ -83,7 +97,7 @@ export default function SnippetList({
                   <Button
                     variant="ghost"
                     size="icon"
-                    onClick={() => setSnippetToDelete(snippet.id)}
+                    onClick={() => setSnippetToDelete(snippet)}
                   >
                     <Trash2 className="h-4 w-4" />
                   </Button>
@@ -94,17 +108,19 @@ export default function SnippetList({
               </CardDescription>
             </CardHeader>
             <CardContent>
-              <CodeViewer value={formatCode(snippet.code)} />
+              <CodeViewer value={formatCode(snippet.code, snippet.language)} />
             </CardContent>
           </Card>
         ))}
       </div>
 
-      <PaginationControls
-        currentPage={currentPage}
-        totalPages={totalPages}
-        setCurrentPage={setCurrentPage}
-      />
+      <div className="flex justify-center mt-4">
+        <PaginationControls
+          currentPage={currentPage}
+          totalPages={totalPages}
+          setCurrentPage={setCurrentPage}
+        />
+      </div>
 
       {currentPageSnippets.length === 0 && (
         <div className="text-center py-8 text-muted-foreground">未找到匹配的代码片段</div>

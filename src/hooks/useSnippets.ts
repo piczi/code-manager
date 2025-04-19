@@ -1,15 +1,7 @@
 import { useState, useEffect, useCallback, useMemo } from 'react';
 import { db } from '../utils/db';
 import { useToast } from '@/components/ui/use-toast';
-
-export interface CodeSnippet {
-  id: string;
-  title: string;
-  code: string;
-  language: string;
-  tags: string[];
-  category: string;
-}
+import { CodeSnippet } from '@/types';
 
 export function useSnippets() {
   const [snippets, setSnippets] = useState<CodeSnippet[]>([]);
@@ -29,13 +21,22 @@ export function useSnippets() {
     tags: [],
     category: 'general'
   });
-  const [snippetToDelete, setSnippetToDelete] = useState<string | null>(null);
+  const [snippetToDelete, setSnippetToDelete] = useState<CodeSnippet | null>(null);
   const { toast } = useToast();
 
   const loadSnippets = useCallback(async () => {
     try {
       const loaded = await db.getAllSnippets();
-      setSnippets(loaded);
+      // Ensure all snippets have the required fields
+      const processedSnippets = loaded.map(snippet => {
+        const now = Date.now();
+        return {
+          ...snippet,
+          createdAt: (snippet as any).createdAt || now,
+          updatedAt: (snippet as any).updatedAt || now
+        };
+      });
+      setSnippets(processedSnippets);
     } catch (error) {
       toast({ title: '错误', description: '加载代码片段失败', variant: 'destructive' });
     }
@@ -78,13 +79,16 @@ export function useSnippets() {
       return;
     }
     const formatted = formatCode(newSnippet.code!);
+    const now = Date.now();
     const snippet: CodeSnippet = {
-      id: Date.now().toString(),
+      id: now.toString(),
       title: newSnippet.title!,
       code: formatted,
       language: newSnippet.language!,
       tags: newSnippet.tags || [],
-      category: newSnippet.category!
+      category: newSnippet.category!,
+      createdAt: now,
+      updatedAt: now
     };
     try {
       await db.saveSnippet(snippet);
@@ -107,8 +111,8 @@ export function useSnippets() {
     }
   }, [loadSnippets, toast]);
 
-  const copySnippet = useCallback((code: string) => {
-    navigator.clipboard.writeText(code);
+  const copySnippet = useCallback((snippet: CodeSnippet) => {
+    navigator.clipboard.writeText(snippet.code);
     toast({ title: '成功', description: '代码已复制到剪贴板' });
   }, [toast]);
 
@@ -148,8 +152,7 @@ export function useSnippets() {
 
   return {
     // 原始和筛选后的片段
-    filteredSnippets,
-    currentPageSnippets,
+    snippets: currentPageSnippets,
     // 状态与操作
     searchTerm,
     setSearchTerm,
@@ -166,8 +169,19 @@ export function useSnippets() {
     totalPages,
     allCategories,
     allTags,
-    saveSnippet,
-    deleteSnippet,
+    handleAddSnippet: saveSnippet,
+    handleDeleteSnippet: deleteSnippet,
+    handleImportSnippets: async (newSnippets: CodeSnippet[]) => {
+      try {
+        for (const snippet of newSnippets) {
+          await db.saveSnippet(snippet);
+        }
+        await loadSnippets();
+        toast({ title: '成功', description: '代码片段已成功导入' });
+      } catch (error) {
+        toast({ title: '错误', description: '导入代码片段失败', variant: 'destructive' });
+      }
+    },
     copySnippet,
     formatCode
   };

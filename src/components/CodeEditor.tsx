@@ -1,30 +1,43 @@
-import React from 'react';
+import React, { useEffect } from 'react';
+import { usePerformance } from '../hooks/usePerformance';
 import AceEditor from 'react-ace';
-import ace from 'ace-builds';
+
+// 导入基础依赖
 import 'ace-builds/src-noconflict/mode-javascript';
 import 'ace-builds/src-noconflict/theme-tomorrow_night';
 import 'ace-builds/src-noconflict/ext-language_tools';
-
-// 配置 Ace Editor 的基础路径
-ace.config.set('basePath', '/ace/');
 
 interface CodeEditorProps {
   value: string;
   onChange: (value: string) => void;
   readOnly?: boolean;
+  mode?: string;
+  theme?: string;
 }
 
 interface CodeViewerProps {
   value: string;
+  mode?: string;
+  theme?: string;
 }
 
-export const CodeViewer: React.FC<CodeViewerProps> = ({ value }) => {
+export const CodeViewer: React.FC<CodeViewerProps> = ({ 
+  value, 
+  mode = 'javascript',
+  theme = 'tomorrow_night'
+}) => {
+  const { startRender } = usePerformance('CodeViewer');
+
+  useEffect(() => {
+    startRender();
+  }, [startRender]);
+
   return (
     <div className="relative rounded-lg overflow-hidden" style={{ minHeight: '200px' }}>
       <div className="absolute inset-0">
         <AceEditor
-          mode="javascript"
-          theme="tomorrow_night"
+          mode={mode}
+          theme={theme}
           value={value}
           name="code-viewer"
           editorProps={{ 
@@ -49,7 +62,6 @@ export const CodeViewer: React.FC<CodeViewerProps> = ({ value }) => {
             enableSnippets: false,
             showFoldWidgets: false,
             showInvisibles: false,
-            // 移除 minLines 和 maxLines 设置，让编辑器自然适应容器高度
             autoScrollEditorIntoView: false,
             scrollPastEnd: true,
             fixedWidthGutter: true,
@@ -81,13 +93,21 @@ const CodeEditor: React.FC<CodeEditorProps> = ({
   value,
   onChange,
   readOnly = false,
+  mode = 'javascript',
+  theme = 'tomorrow_night',
 }) => {
+  const { startRender } = usePerformance('CodeEditor');
+
+  useEffect(() => {
+    startRender();
+  }, [startRender]);
+
   return (
     <div className="h-full relative rounded-lg overflow-hidden">
       <div className="absolute inset-0 bg-[#2d2d2d]">
         <AceEditor
-          mode="javascript"
-          theme="tomorrow_night"
+          mode={mode}
+          theme={theme}
           value={value}
           onChange={onChange}
           name="code-editor"

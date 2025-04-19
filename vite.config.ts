@@ -44,6 +44,16 @@ export default defineConfig({
         fs.ensureDirSync(distAcePath);
         fs.copySync(acePath, distAcePath);
       }
+    },
+    {
+      name: 'copy-ace-resources',
+      async writeBundle() {
+        // 复制 Ace Editor 资源文件
+        const aceSourcePath = path.resolve(__dirname, 'node_modules/ace-builds/src-noconflict');
+        const aceTargetPath = path.resolve(__dirname, 'dist/ace');
+        await fs.ensureDir(aceTargetPath);
+        await fs.copy(aceSourcePath, aceTargetPath);
+      }
     }
   ],
   resolve: {
@@ -56,6 +66,10 @@ export default defineConfig({
     open: '/index.html'
   },
   build: {
+    target: 'esnext',
+    minify: 'terser',
+    sourcemap: true,
+    chunkSizeWarningLimit: 1000,
     rollupOptions: {
       input: {
         popup: path.resolve(__dirname, 'src/main.tsx'),
@@ -71,13 +85,45 @@ export default defineConfig({
           return '[name].[hash][extname]';
         },
         chunkFileNames: '[name].[hash].js',
+        manualChunks(id) {
+          if (id.includes('node_modules')) {
+            if (id.includes('react')) {
+              return 'react-vendor';
+            }
+            if (id.includes('ace-builds')) {
+              if (id.includes('/mode-')) {
+                return 'ace-editor-modes';
+              }
+              if (id.includes('/theme-')) {
+                return 'ace-editor-themes';
+              }
+              if (id.includes('/ext-')) {
+                return 'ace-editor-ext';
+              }
+              return 'ace-editor-core';
+            }
+            if (id.includes('@radix-ui')) {
+              return 'ui-vendor';
+            }
+            return 'vendor';
+          }
+        },
       },
     },
     outDir: 'dist',
     emptyOutDir: true,
     copyPublicDir: true,
     assetsDir: '.',
-    minify: false,
+    terserOptions: {
+      compress: {
+        drop_console: true,
+        drop_debugger: true,
+        pure_funcs: ['console.log', 'console.info', 'console.debug', 'console.warn'],
+      },
+      format: {
+        comments: false,
+      },
+    },
   },
   publicDir: 'public',
   css: {
@@ -90,5 +136,21 @@ export default defineConfig({
     modules: {
       localsConvention: 'camelCase',
     },
+  },
+  optimizeDeps: {
+    include: [
+      'react',
+      'react-dom',
+      'react-ace',
+      'ace-builds',
+      '@radix-ui/react-alert-dialog',
+      '@radix-ui/react-dialog',
+      '@radix-ui/react-dropdown-menu',
+      '@radix-ui/react-label',
+      '@radix-ui/react-select',
+      '@radix-ui/react-slot',
+      '@radix-ui/react-tabs',
+      '@radix-ui/react-toast',
+    ],
   },
 })

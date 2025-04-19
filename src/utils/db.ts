@@ -1,11 +1,4 @@
-interface CodeSnippet {
-  id: string;
-  title: string;
-  code: string;
-  language: string;
-  tags: string[];
-  category: string;
-}
+import { CodeSnippet } from '@/types';
 
 const DB_NAME = 'codeManagerDB';
 const STORE_NAME = 'codeSnippets';
