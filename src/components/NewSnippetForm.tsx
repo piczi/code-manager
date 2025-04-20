@@ -1,5 +1,5 @@
 import { Button } from "@/components/ui/button";
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
@@ -21,7 +21,6 @@ export default function NewSnippetForm({ newSnippet, setNewSnippet, saveSnippet 
           <CardTitle>创建新代码片段</CardTitle>
           <CardDescription>添加一个新的代码片段到您的收藏中</CardDescription>
         </div>
-        <Button onClick={saveSnippet} className="h-9">保存片段</Button>
       </CardHeader>
       <CardContent className="space-y-4">
         <div className="grid grid-cols-2 gap-4">
@@ -101,6 +100,9 @@ export default function NewSnippetForm({ newSnippet, setNewSnippet, saveSnippet 
           </div>
         </div>
       </CardContent>
+      <CardFooter className="flex items-center justify-end">
+        <Button onClick={saveSnippet} className="h-9 flex-1">保存片段</Button>
+      </CardFooter>
     </Card>
   )
 }

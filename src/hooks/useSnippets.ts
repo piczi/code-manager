@@ -19,7 +19,7 @@ export function useSnippets() {
     code: '',
     language: 'javascript',
     tags: [],
-    category: 'general'
+    category: '常规'
   });
   const [snippetToDelete, setSnippetToDelete] = useState<CodeSnippet | null>(null);
   const { toast } = useToast();
@@ -93,7 +93,7 @@ export function useSnippets() {
     try {
       await db.saveSnippet(snippet);
       await loadSnippets();
-      setNewSnippet({ title: '', code: '', language: 'javascript', tags: [], category: 'general' });
+      setNewSnippet({ title: '', code: '', language: 'javascript', tags: [], category: '常规' });
       toast({ title: '成功', description: '代码片段已成功保存' });
     } catch (error) {
       toast({ title: '错误', description: '保存代码片段失败', variant: 'destructive' });
