@@ -49,19 +49,37 @@ export default function SnippetList({
   totalPages
 }: SnippetListProps) {
   const [copiedSnippetId, setCopiedSnippetId] = useState<string | null>(null);
-  const currentPageSnippets = snippets.slice(
-    (currentPage - 1) * 10,
-    currentPage * 10
-  );
+  
+  // 删除这里的重复分页逻辑，直接使用传入的已分页数据
+  // const currentPageSnippets = snippets.slice(
+  //   (currentPage - 1) * 10,
+  //   currentPage * 10
+  // );
 
   // 打开全屏代码查看器
   const openFullscreen = (snippet: CodeSnippet) => {
-    const formattedCode = formatCode(snippet.code, snippet.language);
-    const encodedCode = encodeURIComponent(formattedCode);
-    // 构建完整的URL（包括当前域名和路径）
-    const baseUrl = window.location.origin + window.location.pathname;
-    const fullUrl = `${baseUrl}#/fullscreen?code=${encodedCode}&language=${snippet.language}&title=${encodeURIComponent(snippet.title)}`;
-    window.open(fullUrl, '_blank');
+    try {
+      const formattedCode = formatCode(snippet.code, snippet.language);
+      
+      // 使用localStorage存储代码数据，而不是URL参数
+      const codeKey = `fullscreen_code_${Date.now()}`;
+      const codeData = {
+        code: formattedCode,
+        language: snippet.language,
+        title: snippet.title
+      };
+      
+      // 存储到localStorage
+      localStorage.setItem(codeKey, JSON.stringify(codeData));
+      
+      // 构建URL时只传递存储键，而不是完整代码
+      const baseUrl = window.location.origin + window.location.pathname;
+      const fullUrl = `${baseUrl}#/fullscreen?key=${codeKey}`;
+      window.open(fullUrl, '_blank');
+    } catch (error) {
+      console.error('处理代码数据时出错:', error);
+      alert('无法打开全屏视图，代码数据太大或格式不正确。');
+    }
   };
 
   return (
@@ -79,11 +97,11 @@ export default function SnippetList({
 
       {/* 统计信息 */}
       <div className="text-sm text-muted-foreground mb-4">
-        共 {currentPageSnippets.length} 个代码片段，当前筛选出 {currentPageSnippets.length} 个
+        共 {snippets.length} 个代码片段，当前筛选出 {snippets.length} 个
       </div>
 
       <div className="grid gap-6">
-        {currentPageSnippets.map((snippet) => (
+        {snippets.map((snippet) => (
           <Card key={snippet.id} className="mb-4">
             <CardHeader>
               <div className="flex justify-between items-center">
@@ -147,7 +165,7 @@ export default function SnippetList({
         />
       </div>
 
-      {currentPageSnippets.length === 0 && (
+      {snippets.length === 0 && (
         <div className="text-center py-8 text-muted-foreground">未找到匹配的代码片段</div>
       )}
     </>
