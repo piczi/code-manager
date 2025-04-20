@@ -5,11 +5,11 @@ import { CodeViewer } from "@/components/CodeEditor"
 import type { CodeSnippet } from '@/types'
 import FilterControls from './FilterControls'
 import PaginationControls from './PaginationControls'
+import { Badge } from "@/components/ui/badge"
 import {
   Card,
   CardHeader,
   CardTitle,
-  CardDescription,
   CardContent,
 } from "@/components/ui/card"
 
@@ -99,9 +99,18 @@ export default function SnippetList({
                   </Button>
                 </div>
               </div>
-              <CardDescription>
-                {snippet.category} - {snippet.tags.join(', ')}
-              </CardDescription>
+              <div className="flex flex-wrap gap-1 mt-2">
+                {snippet.category && (
+                  <Badge variant="outline" className="w-fit">
+                    {snippet.category}
+                  </Badge>
+                )}
+                {snippet.tags.map((tag, index) => (
+                  <Badge key={index} variant="secondary" className="bg-secondary/50">
+                    {tag}
+                  </Badge>
+                ))}
+              </div>
             </CardHeader>
             <CardContent>
               <CodeViewer value={formatCode(snippet.code, snippet.language)} />

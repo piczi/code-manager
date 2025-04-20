@@ -1,6 +1,13 @@
 import React, { useCallback } from 'react';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
+import { 
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from '@/components/ui/select';
 
 
 // 防抖函数
@@ -37,6 +44,8 @@ const FilterControls: React.FC<FilterControlsProps> = React.memo(({
   // 本地输入状态，保证输入流畅
   const [localValue, setLocalValue] = React.useState(searchTerm);
 
+  console.log(allCategories, allTags, 1111);
+
   React.useEffect(() => {
     setLocalValue(searchTerm);
   }, [searchTerm]);
@@ -49,7 +58,9 @@ const FilterControls: React.FC<FilterControlsProps> = React.memo(({
     [setSearchTerm]
   );
 
-
+  // 确保 activeCategory 和 activeTag 的值在组件渲染时正确映射
+  const mappedActiveCategory = activeCategory === '全部' ? 'all' : activeCategory;
+  const mappedActiveTag = activeTag === '全部' ? 'all' : activeTag;
 
   return (
     <>
@@ -69,7 +80,7 @@ const FilterControls: React.FC<FilterControlsProps> = React.memo(({
                   setLocalValue(e.target.value);
                   debouncedSearch(e.target.value);
                 }}
-                className="w-full pl-8 pr-2 h-7 rounded-sm border border-input bg-background text-xs"
+                className="w-full pl-8 pr-2 h-8 rounded-sm border border-input bg-background text-sm"
               />
               <div className="absolute inset-y-0 left-0 pl-2 flex items-center pointer-events-none">
                 <svg
@@ -95,19 +106,25 @@ const FilterControls: React.FC<FilterControlsProps> = React.memo(({
             <Label htmlFor="category-filter" className="text-xs font-medium mb-1.5">
               分类
             </Label>
-            <select
-              id="category-filter"
-              value={activeCategory}
-              onChange={(e) => setActiveCategory(e.target.value)}
-              className="w-full text-xs h-7 rounded-sm border border-input bg-background px-3 py-0"
-              aria-label="选择分类"
-              title="选择分类"
+            <Select
+              value={mappedActiveCategory}
+              onValueChange={(value) => setActiveCategory(value === 'all' ? '全部' : value)}
+              placeholder="选择分类"
             >
-              <option value="">分类</option>
-              {allCategories.map(category => (
-                <option key={category} value={category}>{category}</option>
-              ))}
-            </select>
+              <SelectTrigger id="category-filter" className="h-8 text-sm">
+                <SelectValue />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="all">全部分类</SelectItem>
+                {allCategories
+                  .filter(category => category !== '全部')
+                  .map(category => (
+                    <SelectItem key={category} value={category}>
+                      {category}
+                    </SelectItem>
+                  ))}
+              </SelectContent>
+            </Select>
           </div>
 
           {/* 标签筛选 */}
@@ -115,19 +132,25 @@ const FilterControls: React.FC<FilterControlsProps> = React.memo(({
             <Label htmlFor="tag-filter" className="text-xs font-medium mb-1.5">
               标签
             </Label>
-            <select
-              id="tag-filter"
-              value={activeTag}
-              onChange={(e) => setActiveTag(e.target.value)}
-              className="w-full text-xs h-7 rounded-sm border border-input bg-background px-3 py-0"
-              aria-label="选择标签"
-              title="选择标签"
+            <Select
+              value={mappedActiveTag}
+              onValueChange={(value) => setActiveTag(value === 'all' ? '全部' : value)}
+              placeholder="选择标签"
             >
-              <option value="">标签</option>
-              {allTags.map(tag => (
-                <option key={tag} value={tag}>{tag}</option>
-              ))}
-            </select>
+              <SelectTrigger id="tag-filter" className="h-8 text-sm">
+                <SelectValue />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="all">全部标签</SelectItem>
+                {allTags
+                  .filter(tag => tag !== '全部')
+                  .map(tag => (
+                    <SelectItem key={tag} value={tag}>
+                      {tag}
+                    </SelectItem>
+                  ))}
+              </SelectContent>
+            </Select>
           </div>
         </div>
       </div>

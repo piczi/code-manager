@@ -2,6 +2,16 @@ import React, { useEffect } from 'react';
 import { usePerformance } from '../hooks/usePerformance';
 import AceEditor from 'react-ace';
 
+// 导入ace核心模块
+import ace from 'ace-builds';
+// 手动设置Ace编辑器的基础路径，不使用webpack-resolver
+// 注意：这里的路径是相对于构建后的位置
+ace.config.set('basePath', '/node_modules/ace-builds/src-noconflict');
+ace.config.set('modePath', '/node_modules/ace-builds/src-noconflict');
+ace.config.set('themePath', '/node_modules/ace-builds/src-noconflict');
+ace.config.set('workerPath', '/node_modules/ace-builds/src-noconflict');
+// 'extPath' 不是有效的配置选项，移除它
+
 // 导入基础依赖
 import 'ace-builds/src-noconflict/mode-javascript';
 import 'ace-builds/src-noconflict/theme-tomorrow_night';
@@ -119,6 +129,7 @@ const CodeEditor: React.FC<CodeEditorProps> = ({
             showLineNumbers: true,
             tabSize: 2,
             scrollPastEnd: true,
+            useWorker: false, // 禁用 Web Worker 以避免 CSP 问题
           }}
           readOnly={readOnly}
           width="100%"

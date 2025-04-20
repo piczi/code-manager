@@ -122,10 +122,10 @@ export function useSnippets() {
       const lower = searchTerm.toLowerCase();
       filtered = filtered.filter(s => s.title.toLowerCase().includes(lower));
     }
-    if (activeCategory !== '全部') {
+    if (activeCategory !== '全部' && activeCategory !== 'all') {
       filtered = filtered.filter(s => s.category === activeCategory);
     }
-    if (activeTag !== '全部') {
+    if (activeTag !== '全部' && activeTag !== 'all') {
       filtered = filtered.filter(s => s.tags.includes(activeTag));
     }
     return filtered;

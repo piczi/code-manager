@@ -115,11 +115,11 @@ export default defineConfig({
     copyPublicDir: true,
     assetsDir: '.',
     terserOptions: {
-      compress: {
-        drop_console: true,
-        drop_debugger: true,
-        pure_funcs: ['console.log', 'console.info', 'console.debug', 'console.warn'],
-      },
+      // compress: {
+      //   drop_console: true,
+      //   drop_debugger: true,
+      //   pure_funcs: ['console.log', 'console.info', 'console.debug', 'console.warn'],
+      // },
       format: {
         comments: false,
       },
