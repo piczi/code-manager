@@ -29,12 +29,14 @@ interface CodeViewerProps {
   value: string;
   mode?: string;
   theme?: string;
+  isFullscreen?: boolean;
 }
 
 export const CodeViewer: React.FC<CodeViewerProps> = ({ 
   value, 
   mode = 'javascript',
-  theme = 'tomorrow_night'
+  theme = 'tomorrow_night',
+  isFullscreen = false
 }) => {
   const { startRender } = usePerformance('CodeViewer');
 
@@ -43,13 +45,16 @@ export const CodeViewer: React.FC<CodeViewerProps> = ({
   }, [startRender]);
 
   return (
-    <div className="relative rounded-lg overflow-hidden" style={{ minHeight: '200px' }}>
+    <div 
+      className={`relative rounded-lg overflow-hidden ${isFullscreen ? 'fixed inset-0 z-50 bg-background p-6' : ''}`} 
+      style={{ minHeight: isFullscreen ? '100vh' : '200px' }}
+    >
       <div className="absolute inset-0">
         <AceEditor
           mode={mode}
           theme={theme}
           value={value}
-          name="code-viewer"
+          name={`code-viewer-${isFullscreen ? 'fullscreen' : 'normal'}`}
           editorProps={{ 
             $blockScrolling: true
           }}
@@ -65,7 +70,7 @@ export const CodeViewer: React.FC<CodeViewerProps> = ({
             wrap: false,
             useSoftTabs: true,
             useWorker: false,
-            fontSize: 14,
+            fontSize: isFullscreen ? 16 : 14,
             fontFamily: "monospace",
             enableBasicAutocompletion: false,
             enableLiveAutocompletion: false,
@@ -95,6 +100,16 @@ export const CodeViewer: React.FC<CodeViewerProps> = ({
           }}
         />
       </div>
+      {isFullscreen && (
+        <div className="absolute top-4 right-4 z-50">
+          <button 
+            onClick={() => window.close()} 
+            className="bg-primary text-primary-foreground hover:bg-primary/90 p-2 rounded-md"
+          >
+            关闭全屏
+          </button>
+        </div>
+      )}
     </div>
   );
 };

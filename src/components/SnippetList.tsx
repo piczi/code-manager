@@ -1,6 +1,6 @@
 import { useState } from 'react'
 import { Button } from "@/components/ui/button"
-import { Copy, Trash2, Check } from 'lucide-react'
+import { Copy, Trash2, Check, Maximize } from 'lucide-react'
 import { CodeViewer } from "@/components/CodeEditor"
 import type { CodeSnippet } from '@/types'
 import FilterControls from './FilterControls'
@@ -54,6 +54,16 @@ export default function SnippetList({
     currentPage * 10
   );
 
+  // 打开全屏代码查看器
+  const openFullscreen = (snippet: CodeSnippet) => {
+    const formattedCode = formatCode(snippet.code, snippet.language);
+    const encodedCode = encodeURIComponent(formattedCode);
+    // 构建完整的URL（包括当前域名和路径）
+    const baseUrl = window.location.origin + window.location.pathname;
+    const fullUrl = `${baseUrl}#/fullscreen?code=${encodedCode}&language=${snippet.language}&title=${encodeURIComponent(snippet.title)}`;
+    window.open(fullUrl, '_blank');
+  };
+
   return (
     <>
       <FilterControls
@@ -82,11 +92,20 @@ export default function SnippetList({
                   <Button
                     variant="ghost"
                     size="icon"
+                    onClick={() => openFullscreen(snippet)}
+                    title="全屏查看"
+                  >
+                    <Maximize className="h-4 w-4" />
+                  </Button>
+                  <Button
+                    variant="ghost"
+                    size="icon"
                     onClick={() => {
                       copySnippet(snippet)
                       setCopiedSnippetId(snippet.id)
                       setTimeout(() => setCopiedSnippetId(null), 1000)
                     }}
+                    title="复制代码"
                   >
                     {copiedSnippetId === snippet.id ? <Check className="h-4 w-4 text-green-500" /> : <Copy className="h-4 w-4" />}
                   </Button>
@@ -94,6 +113,7 @@ export default function SnippetList({
                     variant="ghost"
                     size="icon"
                     onClick={() => setSnippetToDelete(snippet)}
+                    title="删除代码"
                   >
                     <Trash2 className="h-4 w-4" />
                   </Button>
