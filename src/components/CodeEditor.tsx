@@ -14,6 +14,7 @@ ace.config.set('workerPath', '/node_modules/ace-builds/src-noconflict');
 
 // 导入基础依赖
 import 'ace-builds/src-noconflict/mode-javascript';
+import 'ace-builds/src-noconflict/mode-json'; // 添加JSON语言支持
 import 'ace-builds/src-noconflict/theme-tomorrow_night';
 import 'ace-builds/src-noconflict/ext-language_tools';
 
@@ -42,6 +43,47 @@ export const CodeViewer: React.FC<CodeViewerProps> = ({
 
   useEffect(() => {
     startRender();
+    
+    // 确保 ACE 编辑器的滚动条可见
+    document.documentElement.style.setProperty('--scrollbarBG', 'rgba(100, 100, 100, 0.2)');
+    document.documentElement.style.setProperty('--thumbBG', 'rgba(180, 180, 180, 0.5)');
+    
+    // 应用自定义样式到编辑器
+    const style = document.createElement('style');
+    style.textContent = `
+      .ace_scrollbar::-webkit-scrollbar {
+        width: 10px;
+        height: 10px;
+        background: var(--scrollbarBG);
+      }
+      .ace_scrollbar::-webkit-scrollbar-thumb {
+        background-color: var(--thumbBG);
+        border-radius: 6px;
+      }
+      .ace_scrollbar {
+        scrollbar-width: thin;
+        scrollbar-color: var(--thumbBG) var(--scrollbarBG);
+      }
+      .ace_scrollbar-v {
+        cursor: default;
+        position: absolute;
+        z-index: 6;
+        width: 10px !important;
+        right: 0;
+      }
+      .ace_scrollbar-h {
+        cursor: default;
+        position: absolute;
+        z-index: 6;
+        bottom: 0;
+        height: 10px !important;
+      }
+    `;
+    document.head.appendChild(style);
+
+    return () => {
+      document.head.removeChild(style);
+    };
   }, [startRender]);
 
   return (
@@ -56,7 +98,8 @@ export const CodeViewer: React.FC<CodeViewerProps> = ({
           value={value}
           name={`code-viewer-${isFullscreen ? 'fullscreen' : 'normal'}`}
           editorProps={{ 
-            $blockScrolling: true
+            $blockScrolling: false, // 关闭 blockScrolling 以确保滚动条正常显示
+            showPrintMargin: false,
           }}
           setOptions={{
             showLineNumbers: true,
@@ -86,7 +129,9 @@ export const CodeViewer: React.FC<CodeViewerProps> = ({
             wrapBehavioursEnabled: false,
             copyWithEmptySelection: false,
             fadeFoldWidgets: false,
-            indentedSoftWrap: false
+            indentedSoftWrap: false,
+            hScrollBarAlwaysVisible: true, // 确保水平滚动条总是可见
+            vScrollBarAlwaysVisible: true  // 确保垂直滚动条总是可见
           }}
           width="100%"
           height="100%"
@@ -96,8 +141,11 @@ export const CodeViewer: React.FC<CodeViewerProps> = ({
             top: 0,
             right: 0,
             bottom: 0,
-            left: 0
+            left: 0,
+            fontSize: isFullscreen ? 16 : 14,
           }}
+          wrapEnabled={false}
+          showPrintMargin={false}
         />
       </div>
       {isFullscreen && (
@@ -125,6 +173,10 @@ const CodeEditor: React.FC<CodeEditorProps> = ({
 
   useEffect(() => {
     startRender();
+    
+    // 确保编辑器滚动条可见
+    document.documentElement.style.setProperty('--scrollbarBG', 'rgba(100, 100, 100, 0.2)');
+    document.documentElement.style.setProperty('--thumbBG', 'rgba(180, 180, 180, 0.5)');
   }, [startRender]);
 
   return (
@@ -136,7 +188,10 @@ const CodeEditor: React.FC<CodeEditorProps> = ({
           value={value}
           onChange={onChange}
           name="code-editor"
-          editorProps={{ $blockScrolling: true }}
+          editorProps={{ 
+            $blockScrolling: false, // 关闭 blockScrolling 以确保滚动条正常显示
+            showPrintMargin: false
+          }}
           setOptions={{
             enableBasicAutocompletion: true,
             enableLiveAutocompletion: true,
@@ -145,11 +200,18 @@ const CodeEditor: React.FC<CodeEditorProps> = ({
             tabSize: 2,
             scrollPastEnd: true,
             useWorker: false, // 禁用 Web Worker 以避免 CSP 问题
+            hScrollBarAlwaysVisible: true, // 确保水平滚动条总是可见
+            vScrollBarAlwaysVisible: true  // 确保垂直滚动条总是可见
           }}
           readOnly={readOnly}
           width="100%"
           height="100%"
-          style={{ backgroundColor: '#2d2d2d' }}
+          style={{ 
+            backgroundColor: '#2d2d2d',
+            fontSize: 14 
+          }}
+          wrapEnabled={false}
+          showPrintMargin={false}
         />
       </div>
     </div>

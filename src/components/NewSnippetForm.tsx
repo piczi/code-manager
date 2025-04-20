@@ -49,6 +49,7 @@ export default function NewSnippetForm({ newSnippet, setNewSnippet, saveSnippet 
               <SelectContent>
                 <SelectItem value="none">请选择语言</SelectItem>
                 <SelectItem value="javascript">JavaScript</SelectItem>
+                <SelectItem value="json">JSON</SelectItem>
                 <SelectItem value="typescript">TypeScript</SelectItem>
                 <SelectItem value="python">Python</SelectItem>
                 <SelectItem value="java">Java</SelectItem>
