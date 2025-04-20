@@ -44,8 +44,6 @@ const FilterControls: React.FC<FilterControlsProps> = React.memo(({
   // 本地输入状态，保证输入流畅
   const [localValue, setLocalValue] = React.useState(searchTerm);
 
-  console.log(allCategories, allTags, 1111);
-
   React.useEffect(() => {
     setLocalValue(searchTerm);
   }, [searchTerm]);

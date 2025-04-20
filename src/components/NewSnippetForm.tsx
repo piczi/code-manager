@@ -95,6 +95,7 @@ export default function NewSnippetForm({ newSnippet, setNewSnippet, saveSnippet 
           <div className="h-48 border rounded-md overflow-hidden">
             <CodeEditor
               value={newSnippet.code || ''}
+              mode={newSnippet.language || 'javascript'}
               onChange={(value: string) => setNewSnippet({ ...newSnippet, code: value })}
             />
           </div>

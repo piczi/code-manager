@@ -40,7 +40,6 @@ export const CodeViewer: React.FC<CodeViewerProps> = ({
   isFullscreen = false
 }) => {
   const { startRender } = usePerformance('CodeViewer');
-
   useEffect(() => {
     startRender();
     
