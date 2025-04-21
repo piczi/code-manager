@@ -208,7 +208,10 @@ const CodeEditor: React.FC<CodeEditorProps> = ({
           mode={mode}
           theme={theme}
           value={code}
-          onChange={onChange}
+          onChange={(c) => {
+            setCode(c);
+            onChange(c);
+          }}
           name="code-editor"
           editorProps={{ 
             $blockScrolling: false, // 关闭 blockScrolling 以确保滚动条正常显示
