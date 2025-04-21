@@ -15,13 +15,13 @@ export default function App() {
     setSearchTerm,
     activeCategory,
     setActiveCategory,
-    activeTag,
-    setActiveTag,
+    activeLanguage,
+    setActiveLanguage,
+    allLanguages,
     currentPage,
     setCurrentPage,
     totalPages,
     allCategories,
-    allTags,
     copySnippet,
     setSnippetToDelete,
     formatCode,
@@ -52,13 +52,13 @@ export default function App() {
               setSearchTerm={setSearchTerm}
               activeCategory={activeCategory}
               setActiveCategory={setActiveCategory}
-              activeTag={activeTag}
-              setActiveTag={setActiveTag}
+              activeLanguage={activeLanguage}
+              setActiveLanguage={setActiveLanguage}
               currentPage={currentPage}
               setCurrentPage={setCurrentPage}
               totalPages={totalPages}
               allCategories={allCategories}
-              allTags={allTags}
+              allLanguages={allLanguages}
               copySnippet={copySnippet}
               setSnippetToDelete={setSnippetToDelete}
               formatCode={formatCode}
@@ -71,7 +71,6 @@ export default function App() {
               newSnippet={newSnippet}
               setNewSnippet={setNewSnippet}
               saveSnippet={handleSaveSnippet}
-              allTags={allTags}
             />
           </Suspense>
         </TabsContent>

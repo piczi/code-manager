@@ -26,11 +26,11 @@ export function useSnippets() {
   const [error, setError] = useState<string | null>(null);
   const [searchTerm, setSearchTerm] = useState<string>('');
   const [activeCategory, setActiveCategory] = useState<string>('全部');
-  const [activeTag, setActiveTag] = useState<string>('全部');
+  const [activeLanguage, setActiveLanguage] = useState<string>('全部');
   // 当过滤条件变化时，重置分页到第一页
   useEffect(() => {
     setCurrentPage(1);
-  }, [searchTerm, activeCategory, activeTag]);
+  }, [searchTerm, activeCategory, activeLanguage]);
   const [currentPage, setCurrentPage] = useState<number>(1);
   const snippetsPerPage = SNIPPETS_PER_PAGE;
   const [newSnippet, setNewSnippet] = useState<Partial<CodeSnippet>>({
@@ -158,18 +158,24 @@ const formatCode = async (code: string, language?: string): Promise<string> => {
 
   const filteredSnippets = useMemo(() => {
     let filtered = snippets;
-    if (searchTerm.trim()) {
-      const lower = searchTerm.toLowerCase();
-      filtered = filtered.filter(s => s.title.toLowerCase().includes(lower));
+    if (searchTerm) {
+      filtered = filtered.filter(s => 
+        s.title.toLowerCase().includes(searchTerm.toLowerCase())
+      );
     }
     if (activeCategory !== '全部' && activeCategory !== 'all') {
       filtered = filtered.filter(s => s.category === activeCategory);
     }
-    if (activeTag !== '全部' && activeTag !== 'all') {
-      filtered = filtered.filter(s => s.tags.includes(activeTag));
+    if (activeLanguage !== '全部' && activeLanguage !== 'all') {
+      filtered = filtered.filter(s => s.language === activeLanguage);
     }
-    return filtered;
-  }, [snippets, searchTerm, activeCategory, activeTag]);
+    // 按更新时间倒序排列（新的在前）
+    return filtered.sort((a, b) => {
+      const timeA = a.updatedAt || a.createdAt || 0;
+      const timeB = b.updatedAt || b.createdAt || 0;
+      return timeB - timeA;
+    });
+  }, [snippets, searchTerm, activeCategory, activeLanguage]);
 
   const currentPageSnippets = useMemo(() => {
     const start = (currentPage - 1) * snippetsPerPage;
@@ -184,9 +190,9 @@ const formatCode = async (code: string, language?: string): Promise<string> => {
     return ['全部', ...Array.from(set)];
   }, [snippets]);
 
-  const allTags = useMemo(() => {
+  const allLanguages = useMemo(() => {
     const set = new Set<string>();
-    snippets.forEach(s => s.tags.forEach(t => set.add(t)));
+    snippets.forEach(s => set.add(s.language));
     return ['全部', ...Array.from(set)];
   }, [snippets]);
 
@@ -196,22 +202,22 @@ const formatCode = async (code: string, language?: string): Promise<string> => {
     setSearchTerm,
     activeCategory,
     setActiveCategory,
-    activeTag,
-    setActiveTag,
+    activeLanguage,
+    setActiveLanguage,
+    allLanguages,
     currentPage,
     setCurrentPage,
-    newSnippet,
-    setNewSnippet,
-    snippetToDelete,
-    setSnippetToDelete,
     totalPages,
     allCategories,
-    allTags,
-    isLoading,
-    error,
+    copySnippet,
+    setSnippetToDelete,
+    formatCode,
+    newSnippet,
+    setNewSnippet,
     handleAddSnippet: saveSnippet,
     handleDeleteSnippet: deleteSnippet,
-    copySnippet,
-    formatCode
+    snippetToDelete,
+    isLoading,
+    error
   } as const;
 }

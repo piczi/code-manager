@@ -24,11 +24,10 @@ interface FilterControlsProps {
   setSearchTerm: (term: string) => void;
   activeCategory: string;
   setActiveCategory: (category: string) => void;
-  activeTag: string;
-  setActiveTag: (tag: string) => void;
+  activeLanguage: string;
+  setActiveLanguage: (language: string) => void;
   allCategories: string[];
-  allTags: string[];
-
+  allLanguages: string[];
 }
 
 const FilterControls: React.FC<FilterControlsProps> = React.memo(({
@@ -36,10 +35,10 @@ const FilterControls: React.FC<FilterControlsProps> = React.memo(({
   setSearchTerm,
   activeCategory,
   setActiveCategory,
-  activeTag,
-  setActiveTag,
+  activeLanguage,
+  setActiveLanguage,
   allCategories,
-  allTags,
+  allLanguages,
 }) => {
   // 本地输入状态，保证输入流畅
   const [localValue, setLocalValue] = React.useState(searchTerm);
@@ -56,9 +55,9 @@ const FilterControls: React.FC<FilterControlsProps> = React.memo(({
     [setSearchTerm]
   );
 
-  // 确保 activeCategory 和 activeTag 的值在组件渲染时正确映射
+  // 确保 activeCategory 的值在组件渲染时正确映射
   const mappedActiveCategory = activeCategory === '全部' ? 'all' : activeCategory;
-  const mappedActiveTag = activeTag === '全部' ? 'all' : activeTag;
+  const mappedActiveLanguage = activeLanguage === '全部' ? 'all' : activeLanguage;
 
   return (
     <>
@@ -125,26 +124,26 @@ const FilterControls: React.FC<FilterControlsProps> = React.memo(({
             </Select>
           </div>
 
-          {/* 标签筛选 */}
+          {/* 语言筛选 */}
           <div className="flex-1 min-w-[150px]">
-            <Label htmlFor="tag-filter" className="text-xs font-medium mb-1.5">
-              标签
+            <Label htmlFor="language-filter" className="text-xs font-medium mb-1.5">
+              语言
             </Label>
             <Select
-              value={mappedActiveTag}
-              onValueChange={(value) => setActiveTag(value === 'all' ? '全部' : value)}
-              placeholder="选择标签"
+              value={mappedActiveLanguage}
+              onValueChange={(value) => setActiveLanguage(value === 'all' ? '全部' : value)}
+              placeholder="选择语言"
             >
-              <SelectTrigger id="tag-filter" className="h-8 text-sm">
+              <SelectTrigger id="language-filter" className="h-8 text-sm">
                 <SelectValue />
               </SelectTrigger>
               <SelectContent>
-                <SelectItem value="all">全部标签</SelectItem>
-                {allTags
-                  .filter(tag => tag !== '全部')
-                  .map(tag => (
-                    <SelectItem key={tag} value={tag}>
-                      {tag}
+                <SelectItem value="all">全部语言</SelectItem>
+                {allLanguages
+                  .filter(language => language !== '全部')
+                  .map(language => (
+                    <SelectItem key={language} value={language}>
+                      {language}
                     </SelectItem>
                   ))}
               </SelectContent>

@@ -19,16 +19,16 @@ interface SnippetListProps {
   setSearchTerm: (term: string) => void;
   activeCategory: string;
   setActiveCategory: (category: string) => void;
-  activeTag: string;
-  setActiveTag: (tag: string) => void;
   allCategories: string[];
-  allTags: string[];
   copySnippet: (snippet: CodeSnippet) => void;
   setSnippetToDelete: React.Dispatch<React.SetStateAction<CodeSnippet | null>>;
   formatCode: (code: string, language: string) => Promise<string>;
   currentPage: number;
   setCurrentPage: (page: number) => void;
   totalPages: number;
+  activeLanguage: string;
+  setActiveLanguage: (language: string) => void;
+  allLanguages: string[];
 }
 
 export default function SnippetList({
@@ -37,16 +37,16 @@ export default function SnippetList({
   setSearchTerm,
   activeCategory,
   setActiveCategory,
-  activeTag,
-  setActiveTag,
   allCategories,
-  allTags,
   copySnippet,
   setSnippetToDelete,
   formatCode,
   currentPage,
   setCurrentPage,
-  totalPages
+  totalPages,
+  activeLanguage,
+  setActiveLanguage,
+  allLanguages
 }: SnippetListProps) {
   const [copiedSnippetId, setCopiedSnippetId] = useState<string | null>(null);
   
@@ -89,10 +89,10 @@ export default function SnippetList({
         setSearchTerm={setSearchTerm}
         activeCategory={activeCategory}
         setActiveCategory={setActiveCategory}
-        activeTag={activeTag}
-        setActiveTag={setActiveTag}
         allCategories={allCategories}
-        allTags={allTags}
+        activeLanguage={activeLanguage}
+        setActiveLanguage={setActiveLanguage}
+        allLanguages={allLanguages}
       />
 
       {/* 统计信息 */}
