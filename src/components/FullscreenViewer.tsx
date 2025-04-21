@@ -9,7 +9,7 @@ import { CodeViewer } from './CodeEditor';
 const FullscreenViewer: React.FC = () => {
   // 从URL参数中获取代码和语言
   const [codeData, setCodeData] = React.useState<{
-    code: string;
+    code: string | Promise<string>;
     language: string;
     title: string;
   }>({
@@ -72,7 +72,7 @@ const FullscreenViewer: React.FC = () => {
   return (
     <div className="fullscreen-viewer">
       <CodeViewer 
-        value={codeData.code} 
+        value={Promise.resolve(codeData.code)} 
         mode={codeData.language}
         isFullscreen={true}
       />
