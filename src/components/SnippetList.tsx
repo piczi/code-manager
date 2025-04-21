@@ -25,7 +25,7 @@ interface SnippetListProps {
   allTags: string[];
   copySnippet: (snippet: CodeSnippet) => void;
   setSnippetToDelete: React.Dispatch<React.SetStateAction<CodeSnippet | null>>;
-  formatCode: (code: string, language: string) => string;
+  formatCode: (code: string, language: string) => Promise<string>;
   currentPage: number;
   setCurrentPage: (page: number) => void;
   totalPages: number;
@@ -57,9 +57,9 @@ export default function SnippetList({
   // );
 
   // 打开全屏代码查看器
-  const openFullscreen = (snippet: CodeSnippet) => {
+  const openFullscreen = async (snippet: CodeSnippet) => {
     try {
-      const formattedCode = formatCode(snippet.code, snippet.language);
+      const formattedCode = await formatCode(snippet.code, snippet.language);
       
       // 使用localStorage存储代码数据，而不是URL参数
       const codeKey = `fullscreen_code_${Date.now()}`;
