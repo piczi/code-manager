@@ -2,6 +2,13 @@ import { useState, useEffect, useCallback, useMemo } from 'react';
 import { db } from '../utils/db';
 import { useToast } from '@/components/ui/use-toast';
 import { CodeSnippet } from '@/types';
+import prettier from 'prettier/standalone';
+import parserBabel from 'prettier/parser-babel';
+import parserTypescript from 'prettier/parser-typescript';
+import parserHtml from 'prettier/parser-html';
+import parserMarkdown from 'prettier/parser-markdown';
+import parserPostcss from 'prettier/parser-postcss';
+import { format as sqlFormatter } from 'sql-formatter';
 
 const DEFAULT_NEW_SNIPPET: Partial<CodeSnippet> = {
   title: '',
@@ -68,51 +75,30 @@ export function useSnippets() {
     loadSnippets();
   }, [loadSnippets]);
 
-const formatCode = (code: string): string => {
+const formatCode = async (code: string, language?: string): Promise<string> => {
   if (!code) return '';
-  
-  // Remove extra spaces around dots
-  let formatted = code.replace(/\s*\.\s*/g, '.');
-  
-  // Split lines and process indentation
-  const lines = formatted.split(/\r?\n/);
-  const indentedLines: string[] = [];
-  let indentLevel = 0;
-
-  const processLine = (line: string) => {
-    const trimmed = line.trim();
-    if (!trimmed) return '';
-    
-    // Decrease indentation for closing brackets/parentheses
-    if (/^[}\])]/.test(trimmed) || trimmed.startsWith(')')) {
-      indentLevel = Math.max(0, indentLevel - 1);
+  try {
+    switch (language) {
+      case 'javascript':
+        return await prettier.format(code, { parser: 'babel', plugins: [parserBabel] });
+      case 'typescript':
+        return await prettier.format(code, { parser: 'typescript', plugins: [parserTypescript] });
+      case 'json':
+        return await prettier.format(code, { parser: 'json', plugins: [parserBabel] });
+      case 'html':
+        return await prettier.format(code, { parser: 'html', plugins: [parserHtml] });
+      case 'markdown':
+        return await prettier.format(code, { parser: 'markdown', plugins: [parserMarkdown] });
+      case 'css':
+        return await prettier.format(code, { parser: 'css', plugins: [parserPostcss] });
+      case 'sql':
+        return await sqlFormatter(code);
+      default:
+        return code;
     }
-    
-    // Add indentation
-    const indent = '  '.repeat(indentLevel);
-    const indentedLine = indent + trimmed;
-    
-    // Increase indentation for opening brackets/parentheses
-    if (trimmed.endsWith('{') || trimmed.endsWith('[') || trimmed.endsWith('(')) {
-      indentLevel++;
-    }
-    
-    return indentedLine;
-  };
-
-  // Process each line
-  for (let line of lines) {
-    const processedLine = processLine(line);
-    if (processedLine) indentedLines.push(processedLine);
+  } catch {
+    return code;
   }
-
-  // Join lines and add semicolon if needed
-  formatted = indentedLines.join('\n');
-  if (!formatted.trim().endsWith(';')) {
-    formatted += ';';
-  }
-  
-  return formatted;
 };
 
   const saveSnippet = useCallback(async () => {
@@ -126,7 +112,7 @@ const formatCode = (code: string): string => {
     }
 
     try {
-      const formatted = formatCode(newSnippet.code!);
+      const formatted = await formatCode(newSnippet.code!);
       const now = Date.now();
       const snippet: CodeSnippet = {
         id: now.toString(),
