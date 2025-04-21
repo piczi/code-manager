@@ -31,7 +31,7 @@ import 'ace-builds/src-noconflict/theme-tomorrow_night';
 import 'ace-builds/src-noconflict/ext-language_tools';
 
 interface CodeEditorProps {
-  value: string;
+  value: Promise<string>;
   onChange: (value: string) => void;
   readOnly?: boolean;
   mode?: string;
@@ -39,7 +39,7 @@ interface CodeEditorProps {
 }
 
 interface CodeViewerProps {
-  value: string;
+  value: Promise<string>;
   mode?: string;
   theme?: string;
   isFullscreen?: boolean;
