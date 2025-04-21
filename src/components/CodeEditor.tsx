@@ -57,7 +57,7 @@ export const CodeViewer: React.FC<CodeViewerProps> = ({
     value?.then((c) => {
       setCode(c);
     })
-  }, []);
+  }, [value]);
   useEffect(() => {
     startRender();
     
@@ -192,7 +192,7 @@ const CodeEditor: React.FC<CodeEditorProps> = ({
     value?.then((c) => {
       setCode(c);
     })
-  }, []);
+  }, [value]);
   useEffect(() => {
     startRender();
     
