@@ -30,6 +30,14 @@ import 'ace-builds/src-noconflict/mode-xml';
 import 'ace-builds/src-noconflict/mode-sh';
 import 'ace-builds/src-noconflict/mode-sql';
 import 'ace-builds/src-noconflict/mode-text';
+import 'ace-builds/src-noconflict/mode-swift';
+import 'ace-builds/src-noconflict/mode-golang';
+import 'ace-builds/src-noconflict/mode-svg';
+import 'ace-builds/src-noconflict/mode-ruby';
+import 'ace-builds/src-noconflict/mode-php';
+import 'ace-builds/src-noconflict/mode-csharp';
+import 'ace-builds/src-noconflict/mode-kotlin';
+import 'ace-builds/src-noconflict/mode-rust';
 import 'ace-builds/src-noconflict/theme-tomorrow_night';
 import 'ace-builds/src-noconflict/ext-language_tools';
 

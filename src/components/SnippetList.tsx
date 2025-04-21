@@ -77,7 +77,7 @@ export default function SnippetList({
       alert('无法打开全屏视图，代码数据太大或格式不正确。');
     }
   };
-
+  console.log(snippets, 'snippets');
   return (
     <>
       <FilterControls

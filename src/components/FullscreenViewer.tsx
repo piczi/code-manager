@@ -68,7 +68,7 @@ const FullscreenViewer: React.FC = () => {
       });
     }
   }, []);
-
+  console.log(codeData, 'codeData');
   return (
     <div className="fullscreen-viewer">
       <CodeViewer 
