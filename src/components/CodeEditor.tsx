@@ -1,4 +1,4 @@
-import React, { useEffect } from 'react';
+import React, { useEffect, useState } from 'react';
 import { usePerformance } from '../hooks/usePerformance';
 import AceEditor from 'react-ace';
 
@@ -52,6 +52,12 @@ export const CodeViewer: React.FC<CodeViewerProps> = ({
   isFullscreen = false
 }) => {
   const { startRender } = usePerformance('CodeViewer');
+  const [code, setCode]=  useState('');
+  useEffect(() => {
+    value?.then((c) => {
+      setCode(c);
+    })
+  }, []);
   useEffect(() => {
     startRender();
     
@@ -106,7 +112,7 @@ export const CodeViewer: React.FC<CodeViewerProps> = ({
         <AceEditor
           mode={mode}
           theme={theme}
-          value={value}
+          value={code}
           name={`code-viewer-${isFullscreen ? 'fullscreen' : 'normal'}`}
           editorProps={{ 
             $blockScrolling: false, // 关闭 blockScrolling 以确保滚动条正常显示
@@ -181,7 +187,12 @@ const CodeEditor: React.FC<CodeEditorProps> = ({
   theme = 'tomorrow_night',
 }) => {
   const { startRender } = usePerformance('CodeEditor');
-
+   const [code, setCode]=  useState('');
+  useEffect(() => {
+    value?.then((c) => {
+      setCode(c);
+    })
+  }, []);
   useEffect(() => {
     startRender();
     
@@ -196,7 +207,7 @@ const CodeEditor: React.FC<CodeEditorProps> = ({
         <AceEditor
           mode={mode}
           theme={theme}
-          value={value}
+          value={code}
           onChange={onChange}
           name="code-editor"
           editorProps={{ 
