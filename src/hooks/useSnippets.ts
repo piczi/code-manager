@@ -2,13 +2,8 @@ import { useState, useEffect, useCallback, useMemo } from 'react';
 import { db } from '../utils/db';
 import { useToast } from '@/components/ui/use-toast';
 import { CodeSnippet } from '@/types';
-import prettier from 'prettier/standalone';
-import parserBabel from 'prettier/parser-babel';
-import parserTypescript from 'prettier/parser-typescript';
-import parserHtml from 'prettier/parser-html';
-import parserMarkdown from 'prettier/parser-markdown';
-import parserPostcss from 'prettier/parser-postcss';
 import { format as sqlFormatter } from 'sql-formatter';
+import { js as beautifyJs, html as beautifyHtml, css as beautifyCss } from 'js-beautify';
 
 const DEFAULT_NEW_SNIPPET: Partial<CodeSnippet> = {
   title: '',
@@ -77,26 +72,98 @@ export function useSnippets() {
 
 const formatCode = async (code: string, language?: string): Promise<string> => {
   if (!code) return '';
+  
   try {
-    switch (language) {
+    // 通用的格式化选项
+    const jsOptions = {
+      indent_size: 2,
+      indent_char: ' ',
+      max_preserve_newlines: 1,
+      preserve_newlines: true,
+      keep_array_indentation: false,
+      break_chained_methods: false,
+      indent_scripts: 'normal' as const,
+      brace_style: 'collapse' as const,
+      space_before_conditional: true,
+      unescape_strings: false,
+      jslint_happy: false,
+      end_with_newline: false,
+      indent_empty_lines: false,
+    };
+
+    const htmlOptions = {
+      indent_size: 2,
+      indent_char: ' ',
+      max_preserve_newlines: 1,
+      preserve_newlines: true,
+      indent_inner_html: false,
+      wrap_line_length: 0,
+      indent_scripts: 'normal' as const,
+      brace_style: 'collapse' as const,
+      unformatted: ['code', 'pre', 'em', 'strong', 'span'],
+      content_unformatted: [],
+      extra_liners: ['head', 'body', '/html'],
+      end_with_newline: false,
+    };
+
+    const cssOptions = {
+      indent_size: 2,
+      indent_char: ' ',
+      max_preserve_newlines: 1,
+      preserve_newlines: true,
+      end_with_newline: false,
+    };
+
+    // SQL格式化选项
+    const sqlOptions = {
+      language: 'sql' as const,
+      indent: '  ',
+      uppercase: false,
+      linesBetweenQueries: 2,
+    };
+
+    switch (language?.toLowerCase()) {
       case 'javascript':
-        return await prettier.format(code, { parser: 'babel', plugins: [parserBabel] });
+      case 'js':
+        return beautifyJs(code, jsOptions);
       case 'typescript':
-        return await prettier.format(code, { parser: 'typescript', plugins: [parserTypescript] });
+      case 'ts':
+        return beautifyJs(code, jsOptions);
+      case 'jsx':
+      case 'tsx':
+        return beautifyJs(code, { ...jsOptions, e4x: true });
       case 'json':
-        return await prettier.format(code, { parser: 'json', plugins: [parserBabel] });
+        try {
+          return JSON.stringify(JSON.parse(code), null, 2);
+        } catch (err) {
+          console.error('JSON 格式化失败:', err);
+          return code;
+        }
       case 'html':
-        return await prettier.format(code, { parser: 'html', plugins: [parserHtml] });
-      case 'markdown':
-        return await prettier.format(code, { parser: 'markdown', plugins: [parserMarkdown] });
+      case 'xml':
+      case 'svg':
+        return beautifyHtml(code, htmlOptions);
       case 'css':
-        return await prettier.format(code, { parser: 'css', plugins: [parserPostcss] });
+      case 'scss':
+      case 'less':
+        return beautifyCss(code, cssOptions);
       case 'sql':
-        return await sqlFormatter(code);
-      default:
+        return sqlFormatter(code, sqlOptions);
+      case 'markdown':
+      case 'md':
+        // Markdown 通常不需要特殊格式化
         return code;
+      default:
+        // 尝试使用 js 格式化，如果失败则返回原始代码
+        try {
+          return beautifyJs(code, jsOptions);
+        } catch (e) {
+          return code;
+        }
     }
-  } catch {
+  } catch (error) {
+    console.error('格式化代码失败:', error);
+    // 出错时返回原始代码
     return code;
   }
 };
@@ -112,12 +179,27 @@ const formatCode = async (code: string, language?: string): Promise<string> => {
     }
 
     try {
-      const formatted = await formatCode(newSnippet.code!);
+      // 在保存前格式化代码
+      let formattedCode = newSnippet.code;
+      try {
+        console.log(`开始格式化代码，语言: ${newSnippet.language}`);
+        formattedCode = await formatCode(newSnippet.code, newSnippet.language);
+        console.log('代码格式化成功');
+      } catch (formatError) {
+        console.error('格式化代码失败:', formatError);
+        // 格式化失败时使用原始代码，但不中断保存流程
+        toast({ 
+          title: '警告', 
+          description: '代码格式化失败，将使用原始代码保存', 
+          variant: 'default' 
+        });
+      }
+
       const now = Date.now();
       const snippet: CodeSnippet = {
         id: now.toString(),
         title: newSnippet.title!,
-        code: formatted,
+        code: formattedCode,
         language: newSnippet.language!,
         tags: newSnippet.tags || [],
         category: newSnippet.category!,
@@ -125,12 +207,22 @@ const formatCode = async (code: string, language?: string): Promise<string> => {
         updatedAt: now
       };
 
+      console.log('准备保存的代码片段:', {
+        id: snippet.id,
+        title: snippet.title,
+        language: snippet.language,
+        codeLength: snippet.code.length,
+        tags: snippet.tags,
+        category: snippet.category
+      });
+
       await db.saveSnippet(snippet);
       await loadSnippets();
       setNewSnippet(DEFAULT_NEW_SNIPPET);
       toast({ title: '成功', description: '代码片段已成功保存' });
     } catch (error) {
       const errorMessage = error instanceof Error ? error.message : '保存代码片段失败';
+      console.error('保存代码片段失败:', error);
       setError(errorMessage);
       toast({ 
         title: '错误', 

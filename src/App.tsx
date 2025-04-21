@@ -24,7 +24,6 @@ export default function App() {
     allCategories,
     copySnippet,
     setSnippetToDelete,
-    formatCode,
     newSnippet,
     setNewSnippet,
     handleAddSnippet,
@@ -61,7 +60,6 @@ export default function App() {
               allLanguages={allLanguages}
               copySnippet={copySnippet}
               setSnippetToDelete={setSnippetToDelete}
-              formatCode={formatCode}
             />
           </Suspense>
         </TabsContent>

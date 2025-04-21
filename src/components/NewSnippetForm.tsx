@@ -47,10 +47,20 @@ export default function NewSnippetForm({ newSnippet, setNewSnippet, saveSnippet 
               </SelectTrigger>
               <SelectContent>
                 <SelectItem value="none">请选择语言</SelectItem>
-                <SelectItem value="javascript">JavaScript</SelectItem>
+                <SelectItem value="javascript">JavaScript (js)</SelectItem>
+                <SelectItem value="typescript">TypeScript (ts)</SelectItem>
+                <SelectItem value="jsx">JSX</SelectItem>
+                <SelectItem value="tsx">TSX</SelectItem>
                 <SelectItem value="json">JSON</SelectItem>
-                <SelectItem value="typescript">TypeScript</SelectItem>
-                <SelectItem value="python">Python</SelectItem>
+                <SelectItem value="html">HTML</SelectItem>
+                <SelectItem value="xml">XML</SelectItem>
+                <SelectItem value="svg">SVG</SelectItem>
+                <SelectItem value="css">CSS</SelectItem>
+                <SelectItem value="scss">SCSS</SelectItem>
+                <SelectItem value="less">LESS</SelectItem>
+                <SelectItem value="sql">SQL</SelectItem>
+                <SelectItem value="markdown">Markdown (md)</SelectItem>
+                <SelectItem value="python">Python (py)</SelectItem>
                 <SelectItem value="java">Java</SelectItem>
                 <SelectItem value="c">C</SelectItem>
                 <SelectItem value="cpp">C++</SelectItem>
@@ -62,7 +72,7 @@ export default function NewSnippetForm({ newSnippet, setNewSnippet, saveSnippet 
                 <SelectItem value="kotlin">Kotlin</SelectItem>
                 <SelectItem value="rust">Rust</SelectItem>
                 <SelectItem value="shell">Shell</SelectItem>
-                <SelectItem value="sql">SQL</SelectItem>
+                <SelectItem value="yaml">YAML (yml)</SelectItem>
                 <SelectItem value="text">其它</SelectItem>
               </SelectContent>
             </Select>
@@ -93,7 +103,7 @@ export default function NewSnippetForm({ newSnippet, setNewSnippet, saveSnippet 
           <Label htmlFor="code" className="text-xs font-medium mb-1.5">代码 <span className="text-red-500">*</span></Label>
           <div className="h-48 border rounded-md overflow-hidden">
             <CodeEditor
-              value={Promise.resolve(newSnippet.code || '')}
+              value={newSnippet.code || ''}
               mode={newSnippet.language || 'javascript'}
               onChange={(value: string) => setNewSnippet({ ...newSnippet, code: value })}
             />

@@ -10,7 +10,6 @@ ace.config.set('basePath', '/node_modules/ace-builds/src-noconflict');
 ace.config.set('modePath', '/node_modules/ace-builds/src-noconflict');
 ace.config.set('themePath', '/node_modules/ace-builds/src-noconflict');
 ace.config.set('workerPath', '/node_modules/ace-builds/src-noconflict');
-// 'extPath' 不是有效的配置选项，移除它
 
 // 导入基础依赖
 import 'ace-builds/src-noconflict/mode-javascript';
@@ -20,8 +19,12 @@ import 'ace-builds/src-noconflict/mode-java';
 import 'ace-builds/src-noconflict/mode-c_cpp';
 import 'ace-builds/src-noconflict/mode-markdown';
 import 'ace-builds/src-noconflict/mode-typescript';
+import 'ace-builds/src-noconflict/mode-jsx';
+import 'ace-builds/src-noconflict/mode-tsx';
 import 'ace-builds/src-noconflict/mode-html';
 import 'ace-builds/src-noconflict/mode-css';
+import 'ace-builds/src-noconflict/mode-scss';
+import 'ace-builds/src-noconflict/mode-less';
 import 'ace-builds/src-noconflict/mode-yaml';
 import 'ace-builds/src-noconflict/mode-xml';
 import 'ace-builds/src-noconflict/mode-sh';
@@ -30,8 +33,77 @@ import 'ace-builds/src-noconflict/mode-text';
 import 'ace-builds/src-noconflict/theme-tomorrow_night';
 import 'ace-builds/src-noconflict/ext-language_tools';
 
+// 处理语言模式映射
+const getEditorMode = (lang?: string) => {
+  if (!lang) return 'text';
+  
+  switch (lang.toLowerCase()) {
+    case 'javascript':
+    case 'js':
+      return 'javascript';
+    case 'typescript':
+    case 'ts':
+      return 'typescript';
+    case 'jsx':
+      return 'jsx';
+    case 'tsx':
+      return 'tsx';
+    case 'json':
+      return 'json';
+    case 'html':
+    case 'xml':
+    case 'svg':
+      return 'html';
+    case 'css':
+      return 'css';
+    case 'scss':
+      return 'scss';
+    case 'less':
+      return 'less';
+    case 'sql':
+      return 'sql';
+    case 'markdown':
+    case 'md':
+      return 'markdown';
+    case 'python':
+    case 'py':
+      return 'python';
+    case 'yaml':
+    case 'yml':
+      return 'yaml';
+    case 'java':
+      return 'java';
+    case 'c':
+    case 'cpp':
+    case 'c++':
+      return 'c_cpp';
+    case 'go':
+      return 'golang';
+    case 'ruby':
+      return 'ruby';
+    case 'php':
+      return 'php';
+    case 'csharp':
+    case 'c#':
+      return 'csharp';
+    case 'swift':
+      return 'swift';
+    case 'kotlin':
+      return 'kotlin';
+    case 'rust':
+      return 'rust';
+    case 'shell':
+    case 'sh':
+      return 'sh';
+    default:
+      return 'text';
+  }
+};
+
+// 
+
 interface CodeEditorProps {
-  value: Promise<string>;
+  value: string;
   onChange: (value: string) => void;
   readOnly?: boolean;
   mode?: string;
@@ -39,7 +111,7 @@ interface CodeEditorProps {
 }
 
 interface CodeViewerProps {
-  value: Promise<string>;
+  value: string;
   mode?: string;
   theme?: string;
   isFullscreen?: boolean;
@@ -54,9 +126,7 @@ export const CodeViewer: React.FC<CodeViewerProps> = ({
   const { startRender } = usePerformance('CodeViewer');
   const [code, setCode]=  useState('');
   useEffect(() => {
-    value?.then((c) => {
-      setCode(c);
-    })
+    setCode(value);
   }, [value]);
   useEffect(() => {
     startRender();
@@ -110,7 +180,7 @@ export const CodeViewer: React.FC<CodeViewerProps> = ({
     >
       <div className="absolute inset-0">
         <AceEditor
-          mode={mode}
+          mode={getEditorMode(mode)}
           theme={theme}
           value={code}
           name={`code-viewer-${isFullscreen ? 'fullscreen' : 'normal'}`}
@@ -189,9 +259,7 @@ const CodeEditor: React.FC<CodeEditorProps> = ({
   const { startRender } = usePerformance('CodeEditor');
    const [code, setCode]=  useState('');
   useEffect(() => {
-    value?.then((c) => {
-      setCode(c);
-    })
+    setCode(value);
   }, [value]);
   useEffect(() => {
     startRender();
@@ -205,7 +273,7 @@ const CodeEditor: React.FC<CodeEditorProps> = ({
     <div className="h-full relative rounded-lg overflow-hidden">
       <div className="absolute inset-0 bg-[#2d2d2d]">
         <AceEditor
-          mode={mode}
+          mode={getEditorMode(mode)}
           theme={theme}
           value={code}
           onChange={(c) => {
