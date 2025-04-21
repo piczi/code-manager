@@ -93,7 +93,7 @@ export default function NewSnippetForm({ newSnippet, setNewSnippet, saveSnippet 
           <Label htmlFor="code" className="text-xs font-medium mb-1.5">代码 <span className="text-red-500">*</span></Label>
           <div className="h-48 border rounded-md overflow-hidden">
             <CodeEditor
-              value={newSnippet.code || ''}
+              value={Promise.resolve(newSnippet.code || '')}
               mode={newSnippet.language || 'javascript'}
               onChange={(value: string) => setNewSnippet({ ...newSnippet, code: value })}
             />
