@@ -63,7 +63,7 @@ export default function NewSnippetForm({ newSnippet, setNewSnippet, saveSnippet 
                 <SelectItem value="rust">Rust</SelectItem>
                 <SelectItem value="shell">Shell</SelectItem>
                 <SelectItem value="sql">SQL</SelectItem>
-                <SelectItem value="other">其它</SelectItem>
+                <SelectItem value="text">其它</SelectItem>
               </SelectContent>
             </Select>
           </div>
